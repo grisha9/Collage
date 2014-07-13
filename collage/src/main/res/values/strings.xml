@@ -3,9 +3,13 @@
     <string name="app_name">Collage</string>
     <string name="login">Instagram login</string>
     <string name="action_collage">Get collage</string>
+    <string name="action_images">Get images</string>
+    <string name="action_reset">Reset</string>
     <string name="error_empty_login">Login is empty</string>
     <string name="error_invalid_login">Login not found</string>
     <string name="error_connection">Connection is lost</string>
+    <string name="error_no_image">Please select images</string>
     <string name="connecting">Connecting...</string>
     <string name="images">Images loaded:</string>
+    <string name="share">Share image</string>
 </resources>

@@ -16,4 +16,13 @@ public class Utils {
     public static final String JSON_URL = "url";
     public static final String JSON_LIKES = "likes";
     public static final String JSON_COUNT = "count";
+
+    /**
+     * get image path for collage
+     * @param imageCount images count in collage
+     * @return path to image
+     */
+    public static String getImageTypeForCollage(int imageCount, InstagramImage image) {
+        return  (imageCount > 3) ? image.getThumbnailImage() : image.getNormalImage();
+    }
 }
