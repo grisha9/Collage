@@ -17,6 +17,8 @@ import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
+import com.nostra13.universalimageloader.utils.DiskCacheUtils;
+import com.nostra13.universalimageloader.utils.MemoryCacheUtils;
 import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -153,8 +155,10 @@ public class FragmentImages extends Fragment {
                     displayMetrics);
             int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, IMAGE_PREVIEW_WIDTH,
                     displayMetrics);
-            ImageLoader.getInstance().getDiskCache().clearDiskCache();
-            ImageLoader.getInstance().displayImage(FILE_PREFIX + filename, imageView);
+            String url = FILE_PREFIX + filename;
+            MemoryCacheUtils.removeFromCache(url, ImageLoader.getInstance().getMemoryCache());
+            DiskCacheUtils.removeFromCache(url, ImageLoader.getInstance().getDiskCache());
+            ImageLoader.getInstance().displayImage(url, imageView);
             imageView.setLayoutParams(new ViewGroup.LayoutParams(width, height));
             imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());

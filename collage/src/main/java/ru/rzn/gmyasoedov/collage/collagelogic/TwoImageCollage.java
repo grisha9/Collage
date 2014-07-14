@@ -4,7 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import com.nostra13.universalimageloader.core.ImageLoader;
+import ru.rzn.gmyasoedov.collage.FileManager;
 import ru.rzn.gmyasoedov.collage.InstagramImage;
 
 import java.io.File;
@@ -23,18 +23,18 @@ public class TwoImageCollage extends SimpleCollage{
     public File createCollage() throws IOException {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        Bitmap firstBitmap = BitmapFactory.decodeFile(ImageLoader.getInstance().getDiskCache()
-                .get(images.get(0).getNormalImage()).getAbsolutePath(), options);
-        Bitmap secondBitmap = BitmapFactory.decodeFile(ImageLoader.getInstance().getDiskCache()
-                .get(images.get(1).getNormalImage()).getAbsolutePath(), options);
+        Bitmap firstBitmap = BitmapFactory.decodeFile(FileManager.getInstance().getFile("0")
+            .getAbsolutePath(), options);
+        Bitmap secondBitmap = BitmapFactory.decodeFile(FileManager.getInstance().getFile("1")
+                .getAbsolutePath(), options);
         Bitmap collage = Bitmap.createBitmap(firstBitmap.getWidth() + secondBitmap.getWidth(), firstBitmap.getHeight(),
                 Bitmap.Config.ARGB_8888);
 
         Canvas c = new Canvas(collage);
         c.drawBitmap(firstBitmap, 0, 0, new Paint());
         c.drawBitmap(secondBitmap, firstBitmap.getWidth(), 0, new Paint());
-        ImageLoader.getInstance().getDiskCache().save(COLLAGE, collage);
-        File cacheFile = ImageLoader.getInstance().getDiskCache().get(COLLAGE);
-        return renameFile(cacheFile);
+        firstBitmap.recycle();
+        secondBitmap.recycle();
+        return FileManager.getInstance().saveBitmapToFile(collage, COLLAGE);
     }
 }

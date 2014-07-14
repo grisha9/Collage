@@ -5,6 +5,7 @@ import android.view.View;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
+import ru.rzn.gmyasoedov.collage.FileManager;
 import ru.rzn.gmyasoedov.collage.InstagramImage;
 import ru.rzn.gmyasoedov.collage.Utils;
 import ru.rzn.gmyasoedov.collage.collagelogic.CollageFactory;
@@ -29,6 +30,7 @@ public class InstagramImageLoader implements ImageLoadingListener {
 
     public void startLoading() {
         imageCount = images.size();
+        FileManager.getInstance().clearCacheDirectory();
         listener.onLoadingStarted(null, null);
         onLoadingComplete(null, null, null);
     }
@@ -46,7 +48,7 @@ public class InstagramImageLoader implements ImageLoadingListener {
     public void onLoadingComplete(String s, View view, Bitmap bitmap) {
         if (bitmap != null) {
             try {
-                ImageLoader.getInstance().getDiskCache().save(s, bitmap);
+                FileManager.getInstance().saveBitmapToFile(bitmap, String.valueOf(images.size() - imageCount - 1));
             } catch (IOException e) {
                 onLoadingFailed(s, view, new FailReason(FailReason.FailType.IO_ERROR, e));
                 return;

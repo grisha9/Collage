@@ -1,6 +1,6 @@
 package ru.rzn.gmyasoedov.collage.collagelogic;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
+import ru.rzn.gmyasoedov.collage.FileManager;
 import ru.rzn.gmyasoedov.collage.InstagramImage;
 
 import java.io.File;
@@ -13,7 +13,6 @@ import java.util.List;
  */
 public class SimpleCollage {
     protected static final String COLLAGE = "collage";
-    protected static final String FILE_EXT = ".png";
     protected List<InstagramImage> images;
 
     public SimpleCollage(InstagramImage image) {
@@ -26,15 +25,7 @@ public class SimpleCollage {
     }
 
     public File createCollage() throws IOException {
-        return renameFile(ImageLoader.getInstance().getDiskCache().get(images.get(0).getNormalImage()));
+        return FileManager.getInstance().getFile("0");
     }
 
-    protected File renameFile(File file) {
-        File cache = ImageLoader.getInstance().getDiskCache().getDirectory();
-        File from = new File(cache, file.getName());
-        File to = new File(cache, COLLAGE + FILE_EXT);
-        from.renameTo(to);
-        from.delete();
-        return to;
-    }
 }

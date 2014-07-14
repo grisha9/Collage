@@ -4,9 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import com.nostra13.universalimageloader.core.ImageLoader;
+import ru.rzn.gmyasoedov.collage.FileManager;
 import ru.rzn.gmyasoedov.collage.InstagramImage;
-import ru.rzn.gmyasoedov.collage.Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,8 +35,8 @@ public class MoreImageCollage extends SimpleCollage {
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
 
         //create result bitmap
-        Bitmap partBitmap = BitmapFactory.decodeFile(ImageLoader.getInstance().getDiskCache()
-                .get(Utils.getImageTypeForCollage(images.size(), images.get(0))).getAbsolutePath(), options);
+        Bitmap partBitmap = BitmapFactory.decodeFile(FileManager.getInstance().getFile("0")
+                .getAbsolutePath(), options);
         Bitmap collage = Bitmap.createBitmap(partBitmap.getWidth() * column, partBitmap.getHeight() * row,
                 Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(collage);
@@ -47,17 +46,14 @@ public class MoreImageCollage extends SimpleCollage {
             for (int j = 0; j < column; j++) {
                 int currentImageNumber = i * column + j;
                 if (currentImageNumber < images.size()) {
-                    Bitmap currentBitmap = BitmapFactory.decodeFile(ImageLoader.getInstance().getDiskCache()
-                            .get(Utils.getImageTypeForCollage(images.size(), images.get(currentImageNumber)))
-                            .getAbsolutePath(), options);
+                    Bitmap currentBitmap = BitmapFactory.decodeFile(FileManager.getInstance()
+                            .getFile(String.valueOf(currentImageNumber)).getAbsolutePath(), options);
                     c.drawBitmap(currentBitmap, j * partBitmap.getWidth(), i * partBitmap.getHeight(), new Paint());
+                    currentBitmap.recycle();
                 }
             }
         }
 
-        //save result bitmap to file
-        ImageLoader.getInstance().getDiskCache().save(COLLAGE, collage);
-        File cacheFile = ImageLoader.getInstance().getDiskCache().get(COLLAGE);
-        return renameFile(cacheFile);
+        return FileManager.getInstance().saveBitmapToFile(collage, COLLAGE);
     }
 }
