@@ -12,4 +12,5 @@
     <string name="connecting">Connecting...</string>
     <string name="images">Images loaded:</string>
     <string name="share">Share image</string>
+    <string name="cancel">Cancel</string>
 </resources>

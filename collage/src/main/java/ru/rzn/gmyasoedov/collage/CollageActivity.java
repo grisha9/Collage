@@ -39,5 +39,6 @@ public class CollageActivity extends Activity {
 
     public void showDialog() {
         dialog = ProgressDialog.show(this, null, getString(R.string.connecting));
+        dialog.setCancelable(true);
     }
 }

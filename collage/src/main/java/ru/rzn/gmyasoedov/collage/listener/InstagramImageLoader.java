@@ -29,8 +29,8 @@ public class InstagramImageLoader implements ImageLoadingListener {
 
     public void startLoading() {
         imageCount = images.size();
-        onLoadingComplete(null, null, null);
         listener.onLoadingStarted(null, null);
+        onLoadingComplete(null, null, null);
     }
 
     @Override

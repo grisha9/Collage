@@ -1,17 +1,20 @@
 package ru.rzn.gmyasoedov.collage.fragment;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseBooleanArray;
+import android.util.TypedValue;
 import android.view.*;
-import android.widget.AbsListView;
-import android.widget.GridView;
-import android.widget.Toast;
+import android.widget.*;
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import org.apache.http.Header;
@@ -32,6 +35,9 @@ import java.util.List;
  */
 public class FragmentImages extends Fragment {
     private static final String TAG = FragmentImages.class.getSimpleName();
+    private static final String FILE_PREFIX = "file://";
+    private static final int IMAGE_PREVIEW_HEIGHT = 200;
+    private static final int IMAGE_PREVIEW_WIDTH = 200;
     private List<InstagramImage> images;
     private GridView gridView;
 
@@ -76,7 +82,7 @@ public class FragmentImages extends Fragment {
             case R.id.action_collage:
                 List<InstagramImage> list = new ArrayList<InstagramImage>();
                 SparseBooleanArray positions = gridView.getCheckedItemPositions();
-                for(int i = 0; i < positions.size(); i++) {
+                for (int i = 0; i < positions.size(); i++) {
                     if (positions.valueAt(i)) {
                         list.add(images.get(positions.keyAt(i)));
                     }
@@ -89,6 +95,7 @@ public class FragmentImages extends Fragment {
                 return true;
             case R.id.action_reset:
                 gridView.clearChoices();
+                ((ArrayAdapter) gridView.getAdapter()).notifyDataSetChanged();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -122,11 +129,12 @@ public class FragmentImages extends Fragment {
 
         @Override
         public void onLoadingComplete(String s, View view, Bitmap bitmap) {
-            Intent share = new Intent(Intent.ACTION_SEND);
-            share.setType("image/*");
-            share.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(s)));
-            getActivity().startActivity(Intent.createChooser(share,
-                    getActivity().getResources().getString(R.string.share)));
+            try {
+                ((CollageActivity) getActivity()).hideDialog();
+                shareImageDialog(s);
+            } catch (Exception e) {
+                Log.e(TAG, e.toString());
+            }
         }
 
         @Override
@@ -136,6 +144,41 @@ public class FragmentImages extends Fragment {
             } catch (Exception e) {
                 Log.e(TAG, e.toString());
             }
+        }
+
+        private void shareImageDialog(final String filename) {
+            ImageView imageView = new ImageView(getActivity());
+            DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+            int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, IMAGE_PREVIEW_HEIGHT,
+                    displayMetrics);
+            int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, IMAGE_PREVIEW_WIDTH,
+                    displayMetrics);
+            ImageLoader.getInstance().getDiskCache().clearDiskCache();
+            ImageLoader.getInstance().displayImage(FILE_PREFIX + filename, imageView);
+            imageView.setLayoutParams(new ViewGroup.LayoutParams(width, height));
+            imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle(R.string.share)
+                    .setView(imageView)
+                    .setCancelable(false)
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    })
+                    .setPositiveButton(R.string.share, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Intent share = new Intent(Intent.ACTION_SEND);
+                            share.setType("image/*");
+                            share.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(filename)));
+                            getActivity().startActivity(Intent.createChooser(share,
+                                    getActivity().getResources().getString(R.string.share)));
+                        }
+                    });
+            AlertDialog alert = builder.create();
+            alert.show();
         }
     }
 
@@ -161,6 +204,7 @@ public class FragmentImages extends Fragment {
                 Log.e(TAG, e.toString());
             }
         }
+
         @Override
         public void onSuccess(int i, Header[] headers, String s, List<InstagramImage> instagramImages) {
             try {
@@ -188,7 +232,7 @@ public class FragmentImages extends Fragment {
             JSONArray images = new JSONObject(s).getJSONArray(Utils.JSON_DATA);
             for (int i = 0; i < images.length(); i++) {
                 InstagramImage image = new InstagramImage();
-                JSONObject imageJSON  = images.getJSONObject(i).getJSONObject(Utils.JSON_IMAGES);
+                JSONObject imageJSON = images.getJSONObject(i).getJSONObject(Utils.JSON_IMAGES);
                 image.setLowResolutionImage(imageJSON.getJSONObject(Utils.JSON_LOW_RESOLUTION)
                         .getString(Utils.JSON_URL));
                 image.setNormalImage(imageJSON.getJSONObject(Utils.JSON_NORMAL)

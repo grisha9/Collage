@@ -1,6 +1,7 @@
 package ru.rzn.gmyasoedov.collage;
 
 import android.app.Application;
+import android.content.Context;
 import android.graphics.Bitmap;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
@@ -14,9 +15,12 @@ import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
  * Application class
  */
 public class CollageApplication extends Application {
+    private static Context context;
+
     @Override
     public void onCreate() {
         super.onCreate();
+        this.context = getApplicationContext();
         //display options
         DisplayImageOptions defaultImageDisplayOptions = new DisplayImageOptions.Builder()
                 .bitmapConfig(Bitmap.Config.RGB_565)
@@ -37,5 +41,9 @@ public class CollageApplication extends Application {
                 .defaultDisplayImageOptions(defaultImageDisplayOptions)
                 .build();
         ImageLoader.getInstance().init(config);
+    }
+
+    public static Context getContext() {
+        return context;
     }
 }
